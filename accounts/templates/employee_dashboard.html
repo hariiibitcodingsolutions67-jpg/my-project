@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Employee Dashboard{% endblock %}
+{% block content %}
+<h2>Employee Dashboard</h2>
+
+<div class="row mt-4">
+    <!-- Stats Cards -->
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5>Total Hours Logged</h5>
+                <h2>{{ total_hours|floatformat:2 }}h</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5>Pending TODOs</h5>
+                <h2>{{ pending_todos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5>Completed TODOs</h5>
+                <h2>{{ completed_todos }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- TODOs -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>My TODOs</span>
+                <a href="{% url 'todo_create' %}" class="btn btn-sm btn-primary">+ Add TODO</a>
+            </div>
+            <div class="card-body">
+                {% for todo in todos %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <strong>{{ todo.title }}</strong>
+                        <span class="badge bg-secondary float-end">{{ todo.get_status_display }}</span>
+                        <p class="text-muted mb-1">{{ todo.description|truncatewords:10 }}</p>
+                        <small>{{ todo.date|date:"d M Y" }}</small>
+                        <div class="btn-group btn-group-sm mt-1">
+                            <a href="{% url 'todo_update' todo.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'todo_delete' todo.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No TODOs yet. Create your first one!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Updates -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Daily Updates</span>
+                <a href="{% url 'daily_update_create' %}" class="btn btn-sm btn-primary">+ Add Update</a>
+            </div>
+            <div class="card-body">
+                {% for update in updates %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <strong>{{ update.date|date:"d M Y" }}</strong>
+                        <span class="badge bg-primary float-end">{{ update.working_hours }}h</span>
+                        <p class="mb-1">{{ update.update_text|truncatewords:15 }}</p>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'daily_update_update' update.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'daily_update_delete' update.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No updates yet. Add your first daily update!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

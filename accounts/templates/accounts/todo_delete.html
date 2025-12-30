@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete TODO{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-trash"></i> Delete TODO</h2>
+
+<div class="card border-danger">
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Warning!</strong> Are you sure you want to delete this TODO?
+        </div>
+        
+        <div class="mb-3">
+            <strong>Title:</strong> {{ todo.title }}<br>
+            <strong>Description:</strong> {{ todo.description|default:"N/A" }}<br>
+            <strong>Status:</strong> {{ todo.get_status_display }}
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Yes, Delete TODO
+            </button>
+            <a href="{% url 'todo_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person"></i> My Profile</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        {{ form.address }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Profile Image</label>
+                        {{ form.profile_image }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+                {% else %}
+                <i class="bi bi-person-circle" style="font-size: 10rem;"></i>
+                {% endif %}
+                <h5>{{ user.email }}</h5>
+                <span class="badge bg-primary">{{ user.get_role_display }}</span>
+                <hr>
+                <p><strong>Total Hours:</strong> {{ total_hours }} hrs</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}

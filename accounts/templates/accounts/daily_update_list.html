@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Daily Updates{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-calendar-check"></i> Daily Updates</h2>
+    <a href="{% url 'daily_update_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Create Update
+    </a>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-clock-history"></i>
+    <strong>Total Working Hours:</strong> {{ total_hours }} hours
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if updates %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Update</th>
+                        <th>Working Hours</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for update in updates %}
+                    <tr>
+                        <td><strong>{{ update.date }}</strong></td>
+                        <td>{{ update.update_text|truncatewords:15 }}</td>
+                        <td><span class="badge bg-primary">{{ update.working_hours }} hrs</span></td>
+                        <td>
+                            <a href="{% url 'daily_update_update' update.id %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="{% url 'daily_update_delete' update.id %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No daily updates found. Create your first update!
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

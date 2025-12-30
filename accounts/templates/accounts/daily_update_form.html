@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-calendar-check"></i> {{ title }}</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_date" class="form-label">Date *</label>
+                {{ form.date }}
+            </div>
+            <div class="mb-3">
+                <label for="id_update_text" class="form-label">Update Text *</label>
+                {{ form.update_text }}
+            </div>
+            <div class="mb-3">
+                <label for="id_working_hours" class="form-label">Working Hours *</label>
+                {{ form.working_hours }}
+                <small class="text-muted">Enter hours worked (e.g., 8.5)</small>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Save Update
+            </button>
+            <a href="{% url 'daily_update_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<style>
+input[type="date"], input[type="number"], textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+textarea {
+    min-height: 100px;
+}
+</style>
+{% endblock %}
+
+ 

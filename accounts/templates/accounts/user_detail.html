@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}User Details{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person"></i> User Details</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if user_obj.profile_image %}
+                <img src="{{ user_obj.profile_image.url }}" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+                {% else %}
+                <i class="bi bi-person-circle" style="font-size: 10rem;"></i>
+                {% endif %}
+                <h5>{{ user_obj.email }}</h5>
+                <span class="badge bg-primary mb-2">{{ user_obj.get_role_display }}</span>
+                <br>
+                {% if user_obj.is_verified %}
+                <span class="badge bg-success">Verified</span>
+                {% else %}
+                <span class="badge bg-warning">Pending Verification</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>First Name:</th>
+                        <td>{{ user_obj.first_name|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Name:</th>
+                        <td>{{ user_obj.last_name|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ user_obj.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone:</th>
+                        <td>{{ user_obj.phone|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Address:</th>
+                        <td>{{ user_obj.address|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Working Hours:</th>
+                        <td><strong>{{ total_hours }} hours</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Date Joined:</th>
+                        <td>{{ user_obj.date_joined|date:"F d, Y" }}</td>
+                    </tr>
+                </table>
+                <a href="{% url 'user_update' user_obj.id %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
