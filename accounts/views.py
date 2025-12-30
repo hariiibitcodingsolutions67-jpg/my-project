@@ -222,7 +222,7 @@ def admin_stats(request):
         'projects_by_pm': Project.objects.values('created_by__email').annotate(count=Count('id')),
         'total_working_hours': DailyUpdate.objects.aggregate(total=Sum('working_hours'))['total'] or 0,
     }
-    return render(request, 'admin_stats.html', context)
+    return render(request, 'accounts/admin_stats.html', context)
 
 
 @login_required
@@ -497,4 +497,4 @@ def profile_update(request):
             return redirect('dashboard')
     else:
         form = ProfileForm(instance=request.user)
-    return render(request, 'profile_form.html', {'form': form})
+    return render(request, 'accounts/profile_form.html', {'form': form})

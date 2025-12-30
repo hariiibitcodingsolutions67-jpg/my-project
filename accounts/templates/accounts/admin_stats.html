@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Statistics{% endblock %}
+
+{% block content %}
+<h1>Admin Statistics</h1>
+
+<div style="margin-bottom: 20px;">
+    <h2>Users by Role</h2>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <tr>
+            <th>Role</th>
+            <th>Count</th>
+        </tr>
+        {% for role in users_by_role %}
+        <tr>
+            <td>{{ role.role }}</td>
+            <td>{{ role.count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No data available</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <h2>Projects by PM</h2>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <tr>
+            <th>PM Email</th>
+            <th>Number of Projects</th>
+        </tr>
+        {% for pm in projects_by_pm %}
+        <tr>
+            <td>{{ pm.created_by__email }}</td>
+            <td>{{ pm.count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No data available</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <h2>Total Working Hours</h2>
+    <p>{{ total_working_hours }} hours</p>
+</div>
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+{% endblock %}
