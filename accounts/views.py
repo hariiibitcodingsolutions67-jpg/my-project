@@ -147,6 +147,32 @@ def admin_user_delete(request, user_id):
 
 @login_required
 @admin_required
+def admin_user_update(request, user_id):
+    """Admin can update any user's details (PM or Employee)"""
+    user_obj = get_object_or_404(User, id=user_id)
+    
+    # Prevent editing superuser
+    if user_obj.is_superuser:
+        messages.error(request, 'Cannot edit superuser account')
+        return redirect('admin_users_list')
+    
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'User {user_obj.email} updated successfully')
+            return redirect('admin_user_detail', user_id=user_obj.id)
+    else:
+        form = ProfileForm(instance=user_obj)
+    
+    return render(request, 'user_form.html', {
+        'form': form,
+        'title': f'Update {user_obj.get_role_display()}',
+        'user_obj': user_obj
+    })
+
+@login_required
+@admin_required
 def pm_create(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST, request.FILES)
