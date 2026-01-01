@@ -43,17 +43,82 @@ class UserCreationForm(BaseUserCreationForm):
         self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm Password'})
 
 
+# class ProfileForm(forms.ModelForm):
+#     """Form for updating user profile"""
+#     class Meta:
+#         model = User
+#         fields = ('first_name', 'last_name', 'profile_image')
+#         widgets = {
+#             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
+#             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
+#             'profile_image': forms.FileInput(attrs={'class': 'form-control'}),
+#         }
+
 class ProfileForm(forms.ModelForm):
-    """Form for updating user profile"""
+    """Profile Form for editing user details (without role)"""
+    
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'First Name'
+        })
+    )
+    
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Last Name'
+        })
+    )
+    
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Email'
+        })
+    )
+    
+    profile_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        }),
+        help_text='Upload profile picture'
+    )
+    
+    is_active = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        label='Account Active'
+    )
+    
+    is_verified = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        label='Email Verified'
+    )
+    
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'profile_image')
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
-            'profile_image': forms.FileInput(attrs={'class': 'form-control'}),
-        }
-
+        fields = ['first_name', 'last_name', 'email', 'profile_image', 'is_active', 'is_verified']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Set initial value for checkboxes if instance exists
+        if self.instance and self.instance.pk:
+            self.fields['is_active'].initial = self.instance.is_active
+            self.fields['is_verified'].initial = self.instance.is_verified
 
 class ProjectForm(forms.ModelForm):
     """Form for creating/updating projects"""

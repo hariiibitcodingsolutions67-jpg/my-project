@@ -50,7 +50,7 @@ def logout_view(request):
 def dashboard(request):
     user = request.user
 
-    if user.role == 'ADMIN':
+    if user.role == 'ADMIN':    
         return admin_dashboard(request)
     elif user.role == 'PM':
         return pm_dashboard(request)
@@ -151,7 +151,6 @@ def admin_user_update(request, user_id):
     """Admin can update any user's details (PM or Employee)"""
     user_obj = get_object_or_404(User, id=user_id)
     
-    # Prevent editing superuser
     if user_obj.is_superuser:
         messages.error(request, 'Cannot edit superuser account')
         return redirect('admin_users_list')
@@ -165,7 +164,7 @@ def admin_user_update(request, user_id):
     else:
         form = ProfileForm(instance=user_obj)
     
-    return render(request, 'user_form.html', {
+    return render(request, 'accounts/user_form.html', {
         'form': form,
         'title': f'Update {user_obj.get_role_display()}',
         'user_obj': user_obj

@@ -147,7 +147,7 @@
                                     <td>{{ user.created_by.email|default:"-" }}</td>
                                     <td>
                                         <a href="{% url 'admin_user_detail' user.id %}" class="btn btn-sm btn-primary">View</a>
-                                        <a href="{% url 'admin_user_update' user.id %}" class="btn btn-sm btn-warning">Edit</a>  <!-- ✅ Edit Button -->
+                                        <a href="{% url 'admin_user_update' user.id %}" class="btn btn-sm btn-warning">Edit</a>
                                         {% if not user.is_superuser %}
                                             <a href="{% url 'admin_user_delete' user.id %}" class="btn btn-sm btn-danger">Delete</a>
                                         {% endif %}
@@ -199,42 +199,6 @@
                 </div>
             </div>
 
-            <!-- Recent Daily Updates -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Recent Daily Updates</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Employee</th>
-                                    <th>Date</th>
-                                    <th>Update</th>
-                                    <th>Hours</th>
-                                    <th>Submitted At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for update in recent_updates %}
-                                <tr>
-                                    <td>{{ update.employee.email }}</td>
-                                    <td>{{ update.date|date:"d M Y" }}</td>
-                                    <td>{{ update.update_text|truncatewords:10 }}</td>
-                                    <td><span class="badge bg-primary">{{ update.working_hours }}h</span></td>
-                                    <td>{{ update.created_at|date:"d M Y H:i" }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No updates yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </div>
@@ -242,18 +206,18 @@
 <style>
     /* Gray background for entire page */
     body {
-        background-color:rgb(66, 63, 63) !important;
+        background-color: rgb(66, 63, 63) !important;
     }
     
     /* Main content area */
     main {
-        background-color:rgb(33, 33, 34) !important;
+        background-color: rgb(33, 33, 34) !important;
     }
     
     /* Make cards transparent/gray background */
     .card {
-        background-color:rgb(115, 125, 134) !important;
-        border: 1px solidrgb(119, 122, 126) !important;
+        background-color: rgb(115, 125, 134) !important;
+        border: 1px solid rgb(119, 122, 126) !important;
     }
     
     /* Table background */
@@ -262,16 +226,16 @@
     }
     
     .table thead th {
-        background-color:rgb(136, 139, 143) !important;
-        border-color:rgb(26, 26, 27) !important;
+        background-color: rgb(136, 139, 143) !important;
+        border-color: rgb(26, 26, 27) !important;
     }
     
     .table tbody tr {
-        background-color:rgb(158, 152, 152) !important;
+        background-color: rgb(158, 152, 152) !important;
     }
     
     .table tbody tr:hover {
-        background-color:rgb(36, 120, 204) !important;
+        background-color: rgb(36, 120, 204) !important;
     }
     
     /* Sidebar styles */
@@ -281,12 +245,15 @@
     
     .sidebar .nav-link {
         font-weight: 500;
-        color: rgba(114, 107, 107, 0.8);
+        color: rgba(255, 255, 255, 0.8);
+        padding: 10px 15px;
+        margin: 2px 8px;
+        border-radius: 5px;
     }
     
     .sidebar .nav-link.active {
         color: #fff;
-        background-color: rgba(255, 255, 255, .1);
+        background-color: rgba(255, 255, 255, .15);
     }
     
     .sidebar .nav-link:hover {
@@ -296,8 +263,7 @@
     
     /* Container fluid background */
     .container-fluid {
-        background-color:rgb(49, 53, 58) !important;
+        background-color: rgb(49, 53, 58) !important;
     }
 </style>
 {% endblock %}
-

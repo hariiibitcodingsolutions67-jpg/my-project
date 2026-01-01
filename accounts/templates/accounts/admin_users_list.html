@@ -116,7 +116,7 @@
                                     <td>{{ user.date_joined|date:"d M Y" }}</td>
                                     <td>
                                         <a href="{% url 'admin_user_detail' user.id %}" class="btn btn-sm btn-primary">View</a>
-                                        <a href="{% url 'admin_user_update' user.id %}" class="btn btn-sm btn-warning">Edit</a>  
+                                        <a href="{% url 'admin_user_update' user.id %}" class="btn btn-sm btn-warning">Edit</a>
                                         {% if not user.is_superuser %}
                                             <a href="{% url 'admin_user_delete' user.id %}" class="btn btn-sm btn-danger">Delete</a>
                                         {% endif %}
