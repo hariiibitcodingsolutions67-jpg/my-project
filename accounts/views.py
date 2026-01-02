@@ -282,7 +282,7 @@ def project_create(request):
             return redirect('dashboard')
     else:
         form = ProjectForm()
-    return render(request, 'project_form.html', {'form': form})
+    return render(request, 'accounts/project_form.html', {'form': form})
 
 @login_required
 def project_update(request, pk):
@@ -377,7 +377,7 @@ def employee_update(request, pk):
     }
 )
 
-@login_required
+@login_required 
 def employee_delete(request, pk):
     if request.user.role != 'PM':
         messages.error(request, 'Access denied')
@@ -443,7 +443,7 @@ def todo_create(request):
             return redirect('dashboard')
     else:
         form = TodoForm()
-    return render(request, 'todo_form.html', {'form': form})
+    return render(request, 'accounts/todo_form.html', {'form': form})
 
 @login_required
 def todo_update(request, pk):
@@ -483,7 +483,7 @@ def daily_update_create(request):
             return redirect('dashboard')
     else:
         form = DailyUpdateForm()
-    return render(request, 'update_form.html', {'form': form})
+    return render(request, 'accounts/update_form.html', {'form': form})
 
 @login_required
 def daily_update_update(request, pk):
@@ -498,7 +498,7 @@ def daily_update_update(request, pk):
     else:
         form = DailyUpdateForm(instance=update)
     
-    return render(request, 'update_form.html', {'form': form, 'update': update})
+    return render(request, 'accounts/update_form.html', {'form': form, 'update': update})
 
 @login_required
 def daily_update_delete(request, pk):
@@ -509,7 +509,7 @@ def daily_update_delete(request, pk):
         messages.success(request, 'Daily update deleted successfully')
         return redirect('dashboard')
     
-    return render(request, 'confirm_delete.html', {'object': update, 'type': 'Daily Update'})
+    return render(request, 'accounts/confirm_delete.html', {'object': update, 'type': 'Daily Update'})
 
  
 @login_required

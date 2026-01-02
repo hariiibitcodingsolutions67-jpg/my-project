@@ -1,4 +1,130 @@
 {% extends 'base.html' %}
+
+{% block title %}
+    {% if todo %}Edit TODO{% else %}Create TODO{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3>
+                        <i class="bi bi-list-check"></i> 
+                        {% if todo %}Edit TODO{% else %}Create New TODO{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Error!</strong>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- Title -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-card-text"></i> Title <span class="text-danger">*</span>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.title.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-text-paragraph"></i> Description
+                                </label>
+                                {{ form.description }}
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-flag"></i> Status <span class="text-danger">*</span>
+                                </label>
+                                {{ form.status }}
+                            </div>
+
+                            <!-- Date -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-calendar"></i> Date <span class="text-danger">*</span>
+                                </label>
+                                {{ form.date }}
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-warning text-dark">
+                                <i class="bi bi-check-circle"></i> 
+                                {% if todo %}Update TODO{% else %}Create TODO{% endif %}
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 100px;
+    }
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
 {% block title %}{% if todo %}Edit{% else %}Create{% endif %} TODO{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
@@ -16,4 +142,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} {% endcomment %}
