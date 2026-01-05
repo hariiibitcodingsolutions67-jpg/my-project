@@ -145,27 +145,60 @@ class TodoForm(forms.ModelForm):
 
 
 class DailyUpdateForm(forms.ModelForm):
-    """Form for creating/updating daily updates with working hours"""
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'What did you work on today?',
+            'rows': 4
+        })
+    )
+    
+    working_hours = forms.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': '8.00',
+            'step': '0.25',
+            'min': '0'
+        }),
+        help_text='Enter hours (e.g., 8.5 for 8 hours 30 minutes)'
+    )
+    
+    date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        })
+    )
+    
     class Meta:
         model = DailyUpdate
-        fields = ('date', 'update_text', 'working_hours')
-        widgets = {
-            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'update_text': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 4, 
-                'placeholder': 'What did you work on today?'
-            }),
-            'working_hours': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.5',
-                'min': '0',
-                'max': '24',
-                'placeholder': 'e.g., 8.5'
-            }),
-        }
-        labels = {
-            'update_text': 'Daily Update',
-            'working_hours': 'Working Hours',
-        }
-        help_texts = {'working_hours': 'Enter hours worked (e.g., 8 or 8.5)',}
+        fields = ['description', 'working_hours', 'date']   
+
+
+# class DailyUpdateForm(forms.ModelForm):
+#     """Form for creating/updating daily updates with working hours"""
+#     class Meta:
+#         model = DailyUpdate
+#         fields = ('date', 'update_text', 'working_hours')
+#         widgets = {
+#             'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+#             'update_text': forms.Textarea(attrs={
+#                 'class': 'form-control', 
+#                 'rows': 4, 
+#                 'placeholder': 'What did you work on today?'
+#             }),
+#             'working_hours': forms.NumberInput(attrs={
+#                 'class': 'form-control',
+#                 'step': '0.5',
+#                 'min': '0',
+#                 'max': '24',
+#                 'placeholder': 'e.g., 8.5'
+#             }),
+#         }
+#         labels = {
+#             'update_text': 'Daily Update',
+#             'working_hours': 'Working Hours',
+#         }
+#         help_texts = {'working_hours': 'Enter hours worked (e.g., 8 or 8.5)',}

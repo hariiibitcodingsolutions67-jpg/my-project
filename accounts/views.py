@@ -301,7 +301,7 @@ def project_update(request, pk):
     else:
         form = ProjectForm(instance=project)
     
-    return render(request, 'project_form.html', {'form': form, 'project': project})
+    return render(request, 'accounts/project_form.html', {'form': form, 'project': project})
 
 @login_required
 def project_delete(request, pk):
@@ -316,7 +316,7 @@ def project_delete(request, pk):
         messages.success(request, 'Project deleted successfully')
         return redirect('dashboard')
     
-    return render(request, 'confirm_delete.html', {'object': project, 'type': 'Project'})
+    return render(request, 'accounts/confirm_delete.html', {'object': project, 'type': 'Project'})
 
 @login_required
 def employee_create(request):
@@ -456,7 +456,7 @@ def todo_update(request, pk):
             return redirect('dashboard')
     else:
         form = TodoForm(instance=todo)
-    return render(request, 'todo_form.html', {'form': form, 'todo': todo})
+    return render(request, 'accounts/todo_form.html', {'form': form, 'todo': todo})
 
 @login_required
 def todo_delete(request, pk):
@@ -465,7 +465,7 @@ def todo_delete(request, pk):
         todo.delete()
         messages.success(request, 'Todo deleted')
         return redirect('dashboard')
-    return render(request, 'confirm_delete.html', {'object': todo, 'type': 'Todo'})
+    return render(request, 'accounts/confirm_delete.html', {'object': todo, 'type': 'Todo'})
 
 @login_required
 def daily_update_create(request):
