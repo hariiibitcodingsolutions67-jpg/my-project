@@ -495,7 +495,7 @@ def employee_delete(request, pk):
         messages.success(request, f'Employee {email} deleted successfully')
         return redirect('dashboard')
     
-    return render(request, 'confirm_delete.html', {'object': employee, 'type': 'Employee'})
+    return render(request, 'accounts/confirm_delete.html', {'object': employee, 'type': 'Employee'})
 
 @login_required
 def pm_team_view(request):
