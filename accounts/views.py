@@ -182,18 +182,14 @@ def pm_create(request):
             user.role = 'PM'
             user.created_by = request.user
             
-            # ✅ Checkbox logic - form se value le lo
-            # Form already is_verified save kar dega, but explicitly set karte hain
             if form.cleaned_data.get('is_verified'):
                 user.is_verified = True
-                user.verification_token = ''  # No token needed
+                user.verification_token = ''  
             else:
                 user.is_verified = False
-                # Token signal mein generate hoga
             
             user.save()
             
-            # Success message
             if user.is_verified:
                 messages.success(request, f'PM {user.email} created successfully (Email already verified)')
             else:
@@ -209,7 +205,6 @@ def pm_create(request):
     })
 
 
-# Admin Create Employee
 @login_required
 @admin_required
 def admin_create_employee(request):
@@ -220,7 +215,6 @@ def admin_create_employee(request):
             user.role = 'EMPLOYEE'
             user.created_by = request.user
             
-            # ✅ Checkbox logic
             if form.cleaned_data.get('is_verified'):
                 user.is_verified = True
                 user.verification_token = ''
@@ -244,7 +238,6 @@ def admin_create_employee(request):
     })
 
 
-# PM Create Employee
 @login_required
 def employee_create(request):
     if request.user.role != 'PM':
@@ -258,7 +251,6 @@ def employee_create(request):
             user.role = 'EMPLOYEE'
             user.created_by = request.user
             
-            # ✅ Checkbox logic
             if form.cleaned_data.get('is_verified'):
                 user.is_verified = True
                 user.verification_token = ''
