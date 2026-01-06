@@ -170,6 +170,8 @@ def admin_user_update(request, user_id):
         'user_obj': user_obj
     })
 
+
+# PM Create (Admin only)
 @login_required
 @admin_required
 def pm_create(request):
@@ -179,15 +181,35 @@ def pm_create(request):
             user = form.save(commit=False)
             user.role = 'PM'
             user.created_by = request.user
+            
+            # ✅ Checkbox logic - form se value le lo
+            # Form already is_verified save kar dega, but explicitly set karte hain
+            if form.cleaned_data.get('is_verified'):
+                user.is_verified = True
+                user.verification_token = ''  # No token needed
+            else:
+                user.is_verified = False
+                # Token signal mein generate hoga
+            
             user.save()
-            messages.success(request, f'PM {user.email} created successfully')
+            
+            # Success message
+            if user.is_verified:
+                messages.success(request, f'PM {user.email} created successfully (Email already verified)')
+            else:
+                messages.success(request, f'PM {user.email} created successfully. Verification email sent.')
+            
             return redirect('dashboard')
     else:
         form = UserCreationForm()
     
-    return render(request, 'accounts/user_form.html', {'form': form, 'title': 'Create PM'})
+    return render(request, 'accounts/user_form.html', {
+        'form': form, 
+        'title': 'Create PM'
+    })
 
 
+# Admin Create Employee
 @login_required
 @admin_required
 def admin_create_employee(request):
@@ -197,23 +219,113 @@ def admin_create_employee(request):
             user = form.save(commit=False)
             user.role = 'EMPLOYEE'
             user.created_by = request.user
+            
+            # ✅ Checkbox logic
+            if form.cleaned_data.get('is_verified'):
+                user.is_verified = True
+                user.verification_token = ''
+            else:
+                user.is_verified = False
+            
             user.save()
-            messages.success(
-                request,
-                f'Employee {user.email} created successfully'
-            )
+            
+            if user.is_verified:
+                messages.success(request, f'Employee {user.email} created successfully (Email already verified)')
+            else:
+                messages.success(request, f'Employee {user.email} created successfully. Verification email sent.')
+            
             return redirect('dashboard')
     else:
         form = UserCreationForm()
 
-    return render(
-        request,
-        'accounts/user_form.html',
-        {
-            'form': form,
-            'title': 'Create Employee'
-        }
-    )
+    return render(request, 'accounts/user_form.html', {
+        'form': form,
+        'title': 'Create Employee'
+    })
+
+
+# PM Create Employee
+@login_required
+def employee_create(request):
+    if request.user.role != 'PM':
+        messages.error(request, 'Access denied')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = 'EMPLOYEE'
+            user.created_by = request.user
+            
+            # ✅ Checkbox logic
+            if form.cleaned_data.get('is_verified'):
+                user.is_verified = True
+                user.verification_token = ''
+            else:
+                user.is_verified = False
+            
+            user.save()
+            
+            if user.is_verified:
+                messages.success(request, f'Employee {user.email} created successfully (Email already verified)')
+            else:
+                messages.success(request, 'Employee created successfully. Verification email sent.')
+            
+            return redirect('dashboard')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'accounts/user_form.html', {
+        'form': form, 
+        'title': 'Create Employee'
+    })
+
+
+# @login_required
+# @admin_required
+# def pm_create(request):
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'PM'
+#             user.created_by = request.user
+#             user.save()
+#             messages.success(request, f'PM {user.email} created successfully')
+#             return redirect('dashboard')
+#     else:
+#         form = UserCreationForm()
+    
+#     return render(request, 'accounts/user_form.html', {'form': form, 'title': 'Create PM'})
+
+
+# @login_required
+# @admin_required
+# def admin_create_employee(request):
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'EMPLOYEE'
+#             user.created_by = request.user
+#             user.save()
+#             messages.success(
+#                 request,
+#                 f'Employee {user.email} created successfully'
+#             )
+#             return redirect('dashboard')
+#     else:
+#         form = UserCreationForm()
+
+#     return render(
+#         request,
+#         'accounts/user_form.html',
+#         {
+#             'form': form,
+#             'title': 'Create Employee'
+#         }
+#     )
 
 @login_required
 @admin_required
@@ -318,35 +430,35 @@ def project_delete(request, pk):
     
     return render(request, 'accounts/confirm_delete.html', {'object': project, 'type': 'Project'})
 
-@login_required
-def employee_create(request):
-    if request.user.role != 'PM':
-        messages.error(request, 'Access denied')
-        return redirect('dashboard')
+# @login_required
+# def employee_create(request):
+#     if request.user.role != 'PM':
+#         messages.error(request, 'Access denied')
+#         return redirect('dashboard')
 
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST, request.FILES)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'EMPLOYEE'
-            user.created_by = request.user
-            user.save()
-            messages.success(
-                request,
-                'Employee created successfully'
-            )
-            return redirect('dashboard')
-    else:
-        form = UserCreationForm()
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'EMPLOYEE'
+#             user.created_by = request.user
+#             user.save()
+#             messages.success(
+#                 request,
+#                 'Employee created successfully'
+#             )
+#             return redirect('dashboard')
+#     else:
+#         form = UserCreationForm()
 
-    return render(
-        request,
-        'accounts/user_form.html',   
-        {
-            'form': form,
-            'title': 'Create Employee'
-        }
-    )
+#     return render(
+#         request,
+#         'accounts/user_form.html',   
+#         {
+#             'form': form,
+#             'title': 'Create Employee'
+#         }
+#     )
     
 
 

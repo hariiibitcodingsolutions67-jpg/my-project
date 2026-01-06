@@ -1,4 +1,258 @@
 {% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white py-3">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-plus-fill"></i> {{ title }}
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong><i class="bi bi-exclamation-triangle-fill"></i> Error!</strong>
+                                <ul class="mb-0 mt-2">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-envelope text-primary"></i> Email Address 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.help_text %}
+                                    <small class="form-text text-muted">{{ form.email.help_text }}</small>
+                                {% endif %}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- First Name -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-person text-success"></i> First Name 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.first_name.errors %}
+                                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-person-fill text-success"></i> Last Name 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.last_name.errors %}
+                                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Profile Image -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-image text-info"></i> Profile Image
+                                </label>
+                                {{ form.profile_image }}
+                                {% if form.profile_image.help_text %}
+                                    <small class="form-text text-muted d-block">
+                                        <i class="bi bi-info-circle"></i> {{ form.profile_image.help_text }}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Password -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-lock text-warning"></i> Password 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.password1.errors %}
+                                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-lock-fill text-warning"></i> Confirm Password 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.password2.errors %}
+                                            <i class="bi bi-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- ✅ Account Settings Section (Checkboxes) -->
+                        <div class="card bg-light mt-4 border-0">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3 fw-bold">
+                                    <i class="bi bi-gear-fill text-secondary"></i> Account Settings
+                                </h6>
+                                
+                                <div class="row">
+                                    <!-- Email Verified Checkbox -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check p-3 bg-white rounded border">
+                                            {{ form.is_verified }}
+                                            <label class="form-check-label ms-2" for="{{ form.is_verified.id_for_label }}">
+                                                <strong>
+                                                    {{ form.is_verified.label }}
+                                                </strong>
+                                                {% if form.is_verified.help_text %}
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-info-circle"></i> 
+                                                        {{ form.is_verified.help_text }}
+                                                    </small>
+                                                {% endif %}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Active Status Checkbox -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check p-3 bg-white rounded border">
+                                            {{ form.is_active }}
+                                            <label class="form-check-label ms-2" for="{{ form.is_active.id_for_label }}">
+                                                <strong>
+                                                    {{ form.is_active.label }}
+                                                </strong>
+                                                {% if form.is_active.help_text %}
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-info-circle"></i> 
+                                                        {{ form.is_active.help_text }}
+                                                    </small>
+                                                {% endif %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="bi bi-check-circle-fill"></i> Save User
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg px-4">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-check-input {
+        width: 1.5em;
+        height: 1.5em;
+        margin-top: 0;
+        cursor: pointer;
+        border: 2px solid #dee2e6;
+    }
+    
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    .card {
+        border-radius: 15px;
+    }
+    
+    .btn-lg {
+        border-radius: 10px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .alert {
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
@@ -101,4 +355,4 @@
         </div>
     </div>
 </div>
-{% endblock %}  
+{% endblock %}   {% endcomment %}
