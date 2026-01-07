@@ -15,7 +15,7 @@ def update_working_hours_summary(sender, instance, **kwargs):
         employee = instance.employee
         
         if not employee.created_by:
-            print(f"⚠️  No PM assigned for {employee.email}")
+            print(f"No PM assigned for {employee.email}")
             return
         
         pm = employee.created_by
@@ -33,10 +33,10 @@ def update_working_hours_summary(sender, instance, **kwargs):
         summary.last_updated = timezone.now()
         summary.save()
         
-        print(f"✅ Updated hours for {employee.email}: {total_hours}h (PM: {pm.email})")
+        print(f"Updated hours for {employee.email}: {total_hours}h (PM: {pm.email})")
         
     except Exception as e:
-        print(f"❌ Signal Error: {str(e)}")
+        print(f"Signal Error: {str(e)}")
 
 
 @receiver(post_save, sender=User)
@@ -49,7 +49,6 @@ def send_verification_email_signal(sender, instance, created, **kwargs):
                 token = uuid.uuid4().hex
                 User.objects.filter(pk=instance.pk).update(verification_token=token)
                 
-                # ✅ Match your task parameters
                 send_verification_email.delay(
                     user_email=instance.email,
                     verification_token=token,
@@ -59,10 +58,10 @@ def send_verification_email_signal(sender, instance, created, **kwargs):
                 print(f"📧 Verification email queued for {instance.email}")
                 
         except Exception as e:
-            print(f"❌ Email Signal Error: {str(e)}")
+            print(f"Email Signal Error: {str(e)}")
     
     elif created and instance.is_verified:
-        print(f"✅ User {instance.email} created with pre-verified status (no email sent)")
+        print(f"User {instance.email} created with pre-verified status (no email sent)")
 
 
 
