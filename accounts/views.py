@@ -273,52 +273,6 @@ def employee_create(request):
         'title': 'Create Employee'
     })
 
-
-# @login_required
-# @admin_required
-# def pm_create(request):
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.role = 'PM'
-#             user.created_by = request.user
-#             user.save()
-#             messages.success(request, f'PM {user.email} created successfully')
-#             return redirect('dashboard')
-#     else:
-#         form = UserCreationForm()
-    
-#     return render(request, 'accounts/user_form.html', {'form': form, 'title': 'Create PM'})
-
-
-# @login_required
-# @admin_required
-# def admin_create_employee(request):
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.role = 'EMPLOYEE'
-#             user.created_by = request.user
-#             user.save()
-#             messages.success(
-#                 request,
-#                 f'Employee {user.email} created successfully'
-#             )
-#             return redirect('dashboard')
-#     else:
-#         form = UserCreationForm()
-
-#     return render(
-#         request,
-#         'accounts/user_form.html',
-#         {
-#             'form': form,
-#             'title': 'Create Employee'
-#         }
-#     )
-
 @login_required
 @admin_required
 def admin_projects_list(request):
@@ -421,37 +375,6 @@ def project_delete(request, pk):
         return redirect('dashboard')
     
     return render(request, 'accounts/confirm_delete.html', {'object': project, 'type': 'Project'})
-
-# @login_required
-# def employee_create(request):
-#     if request.user.role != 'PM':
-#         messages.error(request, 'Access denied')
-#         return redirect('dashboard')
-
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.role = 'EMPLOYEE'
-#             user.created_by = request.user
-#             user.save()
-#             messages.success(
-#                 request,
-#                 'Employee created successfully'
-#             )
-#             return redirect('dashboard')
-#     else:
-#         form = UserCreationForm()
-
-#     return render(
-#         request,
-#         'accounts/user_form.html',   
-#         {
-#             'form': form,
-#             'title': 'Create Employee'
-#         }
-#     )
-    
 
 
 @login_required
