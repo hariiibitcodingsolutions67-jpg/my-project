@@ -1,4 +1,365 @@
 {% extends 'base.html' %}
+
+{% block title %}PM Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-briefcase-fill text-primary"></i> Project Manager Dashboard</h2>
+        <div>
+            <span class="badge bg-info text-white px-3 py-2" style="font-size: 1rem;">
+                <i class="bi bi-person-badge"></i> {{ user.get_full_name }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Total Projects</h6>
+                            <h2 class="mb-0 fw-bold">{{ total_projects }}</h2>
+                        </div>
+                        <i class="bi bi-folder-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Team Members</h6>
+                            <h2 class="mb-0 fw-bold">{{ total_employees }}</h2>
+                        </div>
+                        <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Active Projects</h6>
+                            <h2 class="mb-0 fw-bold">{{ projects.count }}</h2>
+                        </div>
+                        <i class="bi bi-diagram-3-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Total Hours</h6>
+                            <h2 class="mb-0 fw-bold">
+                                {% widthratio hours_summary|length 1 1 %}
+                                {{ hours_summary|length|add:"0" }}h
+                            </h2>
+                        </div>
+                        <i class="bi bi-clock-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Projects Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-folder2-open text-success"></i> My Projects
+                    </h5>
+                    <a href="{% url 'project_create' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus-circle"></i> Create Project
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for project in projects %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-folder-fill text-warning"></i>
+                                            <strong>{{ project.name }}</strong>
+                                        </h6>
+                                        <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                                            {{ project.description|truncatewords:15|default:"No description" }}
+                                        </p>
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar-event"></i> 
+                                            Created: {{ project.created_at|date:"d M Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="btn-group btn-group-sm mt-2" role="group">
+                                    <!-- ✅ View Team Button -->
+                                    <a href="{% url 'project_team_view' project.id %}" 
+                                       class="btn btn-primary"
+                                       data-bs-toggle="tooltip"
+                                       title="View team and work">
+                                        <i class="bi bi-eye-fill"></i> View Team
+                                    </a>
+                                    <a href="{% url 'project_update' project.pk %}" 
+                                       class="btn btn-warning"
+                                       data-bs-toggle="tooltip"
+                                       title="Edit project">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
+                                    <a href="{% url 'project_delete' project.pk %}" 
+                                       class="btn btn-danger"
+                                       data-bs-toggle="tooltip"
+                                       title="Delete project">
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </a>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="list-group-item text-center py-5">
+                                <i class="bi bi-folder-x text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="text-muted mt-3 mb-0">
+                                    No projects yet. Create your first project!
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Members Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people-fill text-info"></i> My Team
+                    </h5>
+                    <a href="{% url 'employee_create' %}" class="btn btn-sm btn-info">
+                        <i class="bi bi-person-plus-fill"></i> Add Employee
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for emp in employees %}
+                            <div class="list-group-item">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if emp.profile_image %}
+                                        <img src="{{ emp.profile_image.url }}" 
+                                             alt="{{ emp.get_full_name }}" 
+                                             class="rounded-circle me-3" 
+                                             width="50" height="50">
+                                    {% else %}
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                            {{ emp.first_name|first|upper }}{{ emp.last_name|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">
+                                            <strong>{{ emp.get_full_name|default:"-" }}</strong>
+                                            {% if emp.is_verified %}
+                                                <span class="badge bg-success ms-2" style="font-size: 0.7rem;">
+                                                    <i class="bi bi-check-circle-fill"></i> Verified
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark ms-2" style="font-size: 0.7rem;">
+                                                    <i class="bi bi-hourglass-split"></i> Unverified
+                                                </span>
+                                            {% endif %}
+                                        </h6>
+                                        <small class="text-muted">
+                                            <i class="bi bi-envelope"></i> {{ emp.email }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'employee_update' emp.pk %}" 
+                                       class="btn btn-warning"
+                                       data-bs-toggle="tooltip"
+                                       title="Edit employee">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
+                                    <a href="{% url 'employee_delete' emp.pk %}" 
+                                       class="btn btn-danger"
+                                       data-bs-toggle="tooltip"
+                                       title="Delete employee">
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </a>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="list-group-item text-center py-5">
+                                <i class="bi bi-person-x text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="text-muted mt-3 mb-0">
+                                    No team members yet. Add your first employee!
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Working Hours Summary -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history text-primary"></i> Team Working Hours Summary
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-person"></i> Employee</th>
+                                    <th><i class="bi bi-envelope"></i> Email</th>
+                                    <th><i class="bi bi-clock"></i> Total Hours</th>
+                                    <th><i class="bi bi-calendar-check"></i> Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for summary in hours_summary %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if summary.employee.profile_image %}
+                                                    <img src="{{ summary.employee.profile_image.url }}" 
+                                                         alt="{{ summary.employee.get_full_name }}" 
+                                                         class="rounded-circle me-2" 
+                                                         width="35" height="35">
+                                                {% else %}
+                                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
+                                                         style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                                        {{ summary.employee.first_name|first|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <strong>{{ summary.employee.get_full_name }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ summary.employee.email }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success" style="font-size: 1rem; padding: 0.5em 1em;">
+                                                <i class="bi bi-clock-fill"></i> {{ summary.total_hours|floatformat:1 }}h
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ summary.last_updated|date:"d M Y" }}
+                                            </span>
+                                            <br>
+                                            <small class="text-muted">{{ summary.last_updated|date:"h:i A" }}</small>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                                            <p class="text-muted mt-3 mb-0">
+                                                No working hours data available yet
+                                            </p>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        transition: background-color 0.2s ease;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-group .btn {
+        border-radius: 6px !important;
+        margin: 0 2px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+    
+    .table th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge {
+        padding: 0.4em 0.8em;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+</style>
+
+<!-- ✅ Enable Bootstrap tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
 {% block title %}PM Dashboard{% endblock %}
 {% block content %}
 <h2>Project Manager Dashboard</h2>
@@ -103,4 +464,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} {% endcomment %}

@@ -52,6 +52,259 @@
         <!-- Main Content -->
         <main class="col-md-10 ms-sm-auto px-md-4" style="margin-left: 16.66667%;">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-folder-open text-primary"></i> All Projects
+                </h1>
+            </div>
+
+            <!-- Projects Count Card -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-uppercase mb-1">Total Projects</h6>
+                                    <h2 class="mb-0">{{ projects.count }}</h2>
+                                </div>
+                                <i class="bi bi-folder" style="font-size: 3rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Table -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">
+                        <i class="bi bi-folder2-open text-warning"></i> Projects List
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-folder"></i> Project Name</th>
+                                    <th><i class="bi bi-text-paragraph"></i> Description</th>
+                                    <th><i class="bi bi-person-badge"></i> Created By (PM)</th>
+                                    <th><i class="bi bi-calendar"></i> Created At</th>
+                                    <th class="text-center"><i class="bi bi-gear"></i> Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-folder-fill text-warning me-2"></i>
+                                        <strong>{{ project.name }}</strong>
+                                    </td>
+                                    <td style="max-width: 350px;">
+                                        {% if project.description %}
+                                            {{ project.description|truncatewords:15 }}
+                                        {% else %}
+                                            <span class="text-muted">No description</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ project.created_by.get_full_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-envelope"></i> {{ project.created_by.email }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-calendar-event"></i> 
+                                            {{ project.created_at|date:"d M Y" }}
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">{{ project.created_at|date:"h:i A" }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- ✅ View Team Button -->
+                                        <a href="{% url 'project_team_view' project.id %}" 
+                                           class="btn btn-sm btn-primary"
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="View team members and their work">
+                                            <i class="bi bi-eye-fill"></i> View Team
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="bi bi-inbox" style="font-size: 4rem; opacity: 0.3;"></i>
+                                        <p class="mt-3 mb-0">
+                                            <strong>No projects created yet</strong>
+                                        </p>
+                                        <small class="text-muted">Projects will appear here once PMs create them</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa !important;
+    }
+    
+    .sidebar {
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    }
+    
+    .sidebar .nav-link {
+        font-weight: 500;
+        color: rgba(255, 255, 255, .8);
+        padding: 12px 20px;
+        border-radius: 5px;
+        margin: 5px 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar .nav-link.active {
+        color: #fff;
+        background-color: rgba(255, 255, 255, .2);
+    }
+    
+    .sidebar .nav-link:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, .15);
+    }
+    
+    .card {
+        border-radius: 10px;
+    }
+    
+    .table th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background-color: #f8f9fa;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .badge {
+        padding: 0.4em 0.8em;
+        font-weight: 500;
+    }
+    
+    /* Hover effect on table rows */
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+</style>
+
+<!-- ✅ Enable Bootstrap tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Projects{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-md-block bg-dark sidebar vh-100 position-fixed" style="top: 56px;">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'dashboard' %}">
+                            📊 Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'admin_users_list' %}">
+                            👥 All Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'pm_create' %}">
+                            ➕ Create PM
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'admin_create_employee' %}">
+                            ➕ Create Employee
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white active" href="{% url 'admin_projects_list' %}">
+                            📁 All Projects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'admin_updates_list' %}">
+                            📝 All Updates
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/admin/" target="_blank">
+                            ⚙️ Django Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-10 ms-sm-auto px-md-4" style="margin-left: 16.66667%;">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">All Projects</h1>
             </div>
 
@@ -115,4 +368,4 @@
         background-color: rgba(255, 255, 255, .1);
     }
 </style>
-{% endblock %}
+{% endblock %} {% endcomment %}

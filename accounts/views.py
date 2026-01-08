@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from .models import User, Project, Todo, DailyUpdate, WorkingHoursSummary
+from django.utils import timezone
 from .forms import (
     LoginForm, UserCreationForm, ProjectForm, 
     TodoForm, DailyUpdateForm, ProfileForm
@@ -375,6 +376,52 @@ def project_delete(request, pk):
         return redirect('dashboard')
     
     return render(request, 'accounts/confirm_delete.html', {'object': project, 'type': 'Project'})
+
+@login_required
+@admin_required
+def project_team_view(request, project_id):
+    """View project details with team members and their work"""
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Get PM who created this project
+    pm = project.created_by
+    
+    # Get all employees under this PM
+    employees = User.objects.filter(
+        created_by=pm,
+        role='EMPLOYEE'
+    ).annotate(
+        total_hours=Sum('daily_updates__working_hours'),
+        total_todos=Count('todos'),
+        completed_todos=Count('todos', filter=Q(todos__status='COMPLETED')),
+        pending_todos=Count('todos', filter=Q(todos__status='PENDING'))
+    ).order_by('first_name')
+    
+    # Get recent work by employees (last 30 days)
+    from datetime import timedelta
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    
+    recent_updates = DailyUpdate.objects.filter(
+        employee__created_by=pm,
+        date__gte=thirty_days_ago
+    ).select_related('employee').order_by('-date')[:20]
+    
+    recent_todos = Todo.objects.filter(
+        employee__created_by=pm,
+        date__gte=thirty_days_ago
+    ).select_related('employee').order_by('-date')[:20]
+    
+    context = {
+        'project': project,
+        'pm': pm,
+        'employees': employees,
+        'recent_updates': recent_updates,
+        'recent_todos': recent_todos,
+        'total_employees': employees.count(),
+        'total_hours': employees.aggregate(total=Sum('total_hours'))['total'] or 0,
+    }
+    
+    return render(request, 'accounts/project_team_view.html', context)
 
 
 @login_required

@@ -178,6 +178,7 @@
                                     <th>Description</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -187,6 +188,13 @@
                                     <td>{{ project.description|truncatewords:15 }}</td>
                                     <td>{{ project.created_by.email }}</td>
                                     <td>{{ project.created_at|date:"d M Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'project_team_view' project.id %}" 
+                                        class="btn btn-sm btn-primary">
+                                            View detail
+                                        </a>
+                                    </td>
+
                                 </tr>
                                 {% empty %}
                                 <tr>
