@@ -441,15 +441,7 @@ def employee_update(request, pk):
     else:
         form = ProfileForm(instance=employee)
     
-    return render(
-    request,
-    'accounts/user_form.html',
-    {
-        'form': form,
-        'title': 'Update Employee',
-        'user_obj': employee
-    }
-)
+    return render(request,'accounts/user_form.html',{'form': form,'title': 'Update Employee','user_obj': employee})
 
 @login_required 
 def employee_delete(request, pk):
