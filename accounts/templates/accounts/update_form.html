@@ -1,4 +1,344 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Daily Update</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            padding: 24px 32px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            font-size: 28px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .form-container {
+            background-color: #2a2a2a;
+            padding: 32px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background-color: #155724;
+            border: 1px solid #28a745;
+            color: #d4edda;
+        }
+
+        .alert-error, .alert-warning {
+            background-color: #856404;
+            border: 1px solid #ffc107;
+            color: #fff3cd;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .label-icon {
+            font-size: 20px;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .helper-text {
+            font-size: 14px;
+            color: #888888;
+            margin-top: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        button, .btn-link {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: #17a2b8;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: #138496;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .errorlist {
+            list-style: none;
+            color: #dc3545;
+            background-color: #721c24;
+            border: 1px solid #dc3545;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .errorlist li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="header-icon">📝</span>
+            <h1>{% if update %}Edit{% else %}Add{% endif %} Daily Update</h1>
+        </div>
+        
+        <div class="form-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {% if message.tags == 'success' %}✓{% elif message.tags == 'warning' %}⚠️{% else %}✕{% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" id="dailyUpdateForm">
+                {% csrf_token %}
+                
+                <!-- What did you work on? Section -->
+                <div class="form-group">
+                    <label for="{{ form.update_text.id_for_label }}">
+                        <span class="label-icon">📋</span>
+                        What did you work on?
+                        <span class="required">*</span>
+                    </label>
+                    
+                    {% if form.update_text.errors %}
+                        {{ form.update_text.errors }}
+                    {% endif %}
+                    
+                    {{ form.update_text }}
+                    
+                    <div class="helper-text">Enter details about what you worked on today</div>
+                </div>
+
+                <!-- Working Hours and Date Row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.working_hours.id_for_label }}">
+                            <span class="label-icon">🕐</span>
+                            Working Hours
+                            <span class="required">*</span>
+                        </label>
+                        
+                        {% if form.working_hours.errors %}
+                            {{ form.working_hours.errors }}
+                        {% endif %}
+                        
+                        {{ form.working_hours }}
+                        
+                        <div class="helper-text">Enter hours (e.g., 8.5 for 8 hours 30 minutes)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.date.id_for_label }}">
+                            <span class="label-icon">📅</span>
+                            Date
+                            <span class="required">*</span>
+                        </label>
+                        
+                        {% if form.date.errors %}
+                            {{ form.date.errors }}
+                        {% endif %}
+                        
+                        {{ form.date }}
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">
+                        <span>✓</span>
+                        {% if update %}Update{% else %}Add Update{% endif %}
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn-secondary btn-link">
+                        <span>✕</span>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default for date field if empty
+        const dateInput = document.querySelector('input[name="date"]');
+        if (dateInput && !dateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+
+        // Add proper attributes to form fields
+        const updateTextArea = document.querySelector('textarea[name="update_text"]');
+        if (updateTextArea) {
+            updateTextArea.placeholder = "Describe your work tasks and activities...";
+            updateTextArea.style.minHeight = "120px";
+        }
+
+        const workingHoursInput = document.querySelector('input[name="working_hours"]');
+        if (workingHoursInput) {
+            workingHoursInput.step = "0.1";
+            workingHoursInput.min = "0";
+            workingHoursInput.max = "24";
+            if (!workingHoursInput.value) {
+                workingHoursInput.value = "8.0";
+            }
+        }
+
+        // Form validation
+        document.getElementById('dailyUpdateForm').addEventListener('submit', function(e) {
+            const updateText = updateTextArea?.value.trim();
+            const workingHours = workingHoursInput?.value;
+            const date = dateInput?.value;
+
+            if (!updateText || !workingHours || !date) {
+                e.preventDefault();
+                alert('Please fill all required fields!');
+                return false;
+            }
+
+            if (parseFloat(workingHours) <= 0 || parseFloat(workingHours) > 24) {
+                e.preventDefault();
+                alert('Working hours must be between 0 and 24!');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>
+ 
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
 
 {% block title %}
     {% if update %}Edit Daily Update{% else %}Add Daily Update{% endif %}
@@ -115,7 +455,7 @@
         min-height: 120px;
     }
 </style>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 

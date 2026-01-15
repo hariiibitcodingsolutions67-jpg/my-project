@@ -535,6 +535,7 @@ def todo_delete(request, pk):
 
 @login_required
 def daily_update_create(request):
+    """Create or update daily update (handles duplicates)"""
     if request.user.role != 'EMPLOYEE':
         messages.error(request, 'Access denied')
         return redirect('dashboard')
@@ -542,14 +543,56 @@ def daily_update_create(request):
     if request.method == 'POST':
         form = DailyUpdateForm(request.POST)
         if form.is_valid():
-            update = form.save(commit=False)
-            update.employee = request.user
-            update.save()
-            messages.success(request, 'Daily update created successfully')
+            date = form.cleaned_data['date']
+            update_text = form.cleaned_data['update_text']  # ✅ Use 'update_text'
+            working_hours = form.cleaned_data['working_hours']
+            
+            # ✅ Use update_or_create to avoid duplicate error
+            update, created = DailyUpdate.objects.update_or_create(
+                employee=request.user,
+                date=date,
+                defaults={
+                    'update_text': update_text,
+                    'working_hours': working_hours,
+                }
+            )
+            
+            # User-friendly messages
+            if created:
+                messages.success(
+                    request, 
+                    f'✅ Daily update for {date.strftime("%B %d, %Y")} created successfully!'
+                )
+            else:
+                messages.warning(
+                    request, 
+                    f'⚠️ Daily update for {date.strftime("%B %d, %Y")} already existed and has been updated!'
+                )
+            
             return redirect('dashboard')
     else:
         form = DailyUpdateForm()
+    
     return render(request, 'accounts/update_form.html', {'form': form})
+
+
+# @login_required
+# def daily_update_create(request):
+#     if request.user.role != 'EMPLOYEE':
+#         messages.error(request, 'Access denied')
+#         return redirect('dashboard')
+    
+#     if request.method == 'POST':
+#         form = DailyUpdateForm(request.POST)
+#         if form.is_valid():
+#             update = form.save(commit=False)
+#             update.employee = request.user
+#             update.save()
+#             messages.success(request, 'Daily update created successfully')
+#             return redirect('dashboard')
+#     else:
+#         form = DailyUpdateForm()
+#     return render(request, 'accounts/update_form.html', {'form': form})
 
 @login_required
 def daily_update_update(request, pk):

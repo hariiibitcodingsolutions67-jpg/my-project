@@ -143,7 +143,155 @@
         </div>
     </div>
 
+
     <!-- Recent Daily Updates -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-journal-text text-info"></i> Recent Daily Updates (Last 30 Days)</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Date</th>
+                        <th>Work Description</th>
+                        <th>Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for update in recent_updates %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if update.employee.profile_image %}
+                                    <img src="{{ update.employee.profile_image.url }}" 
+                                         alt="{{ update.employee.get_full_name }}" 
+                                         class="rounded-circle me-2" 
+                                         width="35" height="35">
+                                {% else %}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                        {{ update.employee.first_name|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ update.employee.get_full_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ update.employee.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">
+                                <i class="bi bi-calendar-event"></i> 
+                                {{ update.date|date:"M d, Y" }}
+                            </span>
+                            <br>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> 
+                                {{ update.created_at|date:"h:i A" }}
+                            </small>
+                        </td>
+                        <td style="max-width: 400px;">
+                            <!-- ✅ CHANGE THIS: Use 'update_text' instead of 'description' -->
+                            {% if update.update_text %}
+                                <div class="description-text">
+                                    {{ update.update_text|linebreaks|truncatewords:30 }}
+                                </div>
+                                
+                                <!-- Show "View Full" button for long descriptions -->
+                                {% if update.update_text|length > 100 %}
+                                    <button class="btn btn-sm btn-link p-0 mt-1" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#updateModal{{ update.id }}">
+                                        <i class="bi bi-eye"></i> View Full
+                                    </button>
+                                    
+                                    <!-- Modal for full description -->
+                                    <div class="modal fade" id="updateModal{{ update.id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                        <i class="bi bi-journal-text"></i> 
+                                                        Work Description - {{ update.date|date:"M d, Y" }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <strong>Employee:</strong> {{ update.employee.get_full_name }}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <strong>Date:</strong> {{ update.date|date:"F d, Y" }}
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <strong>Hours Worked:</strong> {{ update.working_hours }}h
+                                                    </div>
+                                                    <hr>
+                                                    <div class="work-description">
+                                                        {{ update.update_text|linebreaks }}
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted fst-italic">
+                                    <i class="bi bi-dash-circle"></i> No description provided
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-success" style="font-size: 0.95rem; padding: 0.5em 1em;">
+                                <i class="bi bi-clock-fill"></i> {{ update.working_hours }}h
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <i class="bi bi-inbox" style="font-size: 4rem; opacity: 0.3;"></i>
+                            <p class="mt-3 mb-0 text-muted">
+                                <strong>No recent updates found</strong>
+                            </p>
+                            <small class="text-muted">
+                                Employees haven't submitted any work updates in the last 30 days
+                            </small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .description-text {
+        line-height: 1.6;
+        color: #333;
+    }
+    
+    .description-text p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .work-description {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #0dcaf0;
+    }
+</style>    
+
+    {% comment %} <!-- Recent Daily Updates -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
             <h5 class="mb-0"><i class="bi bi-journal-text text-info"></i> Recent Daily Updates (Last 30 Days)</h5>
@@ -193,7 +341,7 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 
     <!-- Recent TODOs -->
     <div class="card shadow-sm mb-4">
