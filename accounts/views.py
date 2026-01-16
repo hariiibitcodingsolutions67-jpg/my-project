@@ -551,23 +551,14 @@ def daily_update_create(request):
             update, created = DailyUpdate.objects.update_or_create(
                 employee=request.user,
                 date=date,
-                defaults={
-                    'update_text': update_text,
-                    'working_hours': working_hours,
-                }
+                defaults={'update_text': update_text,'working_hours': working_hours,}
             )
             
             # User-friendly messages
             if created:
-                messages.success(
-                    request, 
-                    f'✅ Daily update for {date.strftime("%B %d, %Y")} created successfully!'
-                )
+                messages.success(request, f'Daily update for {date.strftime("%B %d, %Y")} created successfully!')
             else:
-                messages.warning(
-                    request, 
-                    f'⚠️ Daily update for {date.strftime("%B %d, %Y")} already existed and has been updated!'
-                )
+                messages.warning(request, f'Daily update for {date.strftime("%B %d, %Y")} already existed and has been updated!')
             
             return redirect('dashboard')
     else:
