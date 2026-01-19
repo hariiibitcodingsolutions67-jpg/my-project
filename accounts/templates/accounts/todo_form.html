@@ -107,39 +107,3 @@
     }
 </style>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{% comment %} {% extends 'base.html' %}
-{% block title %}{% if todo %}Edit{% else %}Create{% endif %} TODO{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">{% if todo %}Edit{% else %}Create{% endif %} TODO</div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %} {% endcomment %}
