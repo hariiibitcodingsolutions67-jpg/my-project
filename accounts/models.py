@@ -155,6 +155,64 @@ class DailyUpdate(models.Model):
         verbose_name_plural = 'Daily Updates'
 
 
+# class Leave(models.Model):
+#     """Leave Management System"""
+    
+#     LEAVE_TYPE_CHOICES = (
+#         ('SICK', 'Sick Leave'),
+#         ('CASUAL', 'Casual Leave'),
+#         ('EARNED', 'Earned Leave'),
+#         ('EMERGENCY', 'Emergency Leave'),
+#     )
+    
+#     STATUS_CHOICES = (
+#         ('PENDING', 'Pending'),
+#         ('APPROVED', 'Approved'),
+#         ('REJECTED', 'Rejected'),
+#     )
+    
+#     # ✅ FIX: CASCADE delete
+#     employee = models.ForeignKey(
+#         User, 
+#         on_delete=models.CASCADE,  # ← Already correct
+#         limit_choices_to={'role': 'EMPLOYEE'}, 
+#         related_name='leaves'
+#     )
+#     leave_type = models.CharField(max_length=20, choices=LEAVE_TYPE_CHOICES)
+#     start_date = models.DateField()
+#     end_date = models.DateField()
+#     reason = models.TextField()
+#     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    
+#     # ✅ FIX: SET_NULL instead of CASCADE for approver
+#     approved_by = models.ForeignKey(
+#         User, 
+#         on_delete=models.SET_NULL,  # ← Approver delete ho to NULL ho jaye
+#         null=True, 
+#         blank=True, 
+#         related_name='approved_leaves'
+#     )
+#     remarks = models.TextField(blank=True, help_text="PM/Admin remarks")
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+    
+#     def __str__(self):
+#         return f"{self.employee.email} - {self.leave_type} ({self.start_date} to {self.end_date})"
+    
+#     @property
+#     def total_days(self):
+#         """Calculate total leave days"""
+#         return (self.end_date - self.start_date).days + 1
+    
+#     class Meta:
+#         db_table = 'leaves'
+#         ordering = ['-created_at']
+#         verbose_name = 'Leave'
+#         verbose_name_plural = 'Leaves'
+
+
+# models.py
+
 class Leave(models.Model):
     """Leave Management System"""
     
@@ -171,10 +229,9 @@ class Leave(models.Model):
         ('REJECTED', 'Rejected'),
     )
     
-    # ✅ FIX: CASCADE delete
     employee = models.ForeignKey(
         User, 
-        on_delete=models.CASCADE,  # ← Already correct
+        on_delete=models.CASCADE,  # ✅ Employee delete → Leave delete
         limit_choices_to={'role': 'EMPLOYEE'}, 
         related_name='leaves'
     )
@@ -184,10 +241,10 @@ class Leave(models.Model):
     reason = models.TextField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     
-    # ✅ FIX: SET_NULL instead of CASCADE for approver
+    # ✅ FIX: SET_NULL add karo
     approved_by = models.ForeignKey(
         User, 
-        on_delete=models.SET_NULL,  # ← Approver delete ho to NULL ho jaye
+        on_delete=models.SET_NULL,  # ← YE ZAROORI HAI!
         null=True, 
         blank=True, 
         related_name='approved_leaves'
@@ -209,7 +266,6 @@ class Leave(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Leave'
         verbose_name_plural = 'Leaves'
-
 
 class WorkingHoursSummary(models.Model):
     """Working Hours Summary - Auto-updated via signals for PM dashboard"""

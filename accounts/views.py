@@ -3,7 +3,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
-from .models import User, Project, Todo, DailyUpdate, WorkingHoursSummary
+from .models import User, Project, Todo, DailyUpdate, WorkingHoursSummary, Leave
+from django.db import transaction
 from django.utils import timezone
 from .forms import (
     LoginForm, UserCreationForm, ProjectForm, 
@@ -443,8 +444,26 @@ def employee_update(request, pk):
     
     return render(request,'accounts/user_form.html',{'form': form,'title': 'Update Employee','user_obj': employee})
 
+# @login_required 
+# def employee_delete(request, pk):
+#     if request.user.role != 'PM':
+#         messages.error(request, 'Access denied')
+#         return redirect('dashboard')
+    
+#     employee = get_object_or_404(User, pk=pk, created_by=request.user, role='EMPLOYEE')
+    
+#     if request.method == 'POST':
+#         email = employee.email
+#         employee.delete()
+#         messages.success(request, f'Employee {email} deleted successfully')
+#         return redirect('dashboard')
+    
+#     return render(request, 'accounts/confirm_delete.html', {'object': employee, 'type': 'Employee'})
+
+
 @login_required 
 def employee_delete(request, pk):
+    """PM deletes employee - with proper cleanup"""
     if request.user.role != 'PM':
         messages.error(request, 'Access denied')
         return redirect('dashboard')
@@ -453,11 +472,29 @@ def employee_delete(request, pk):
     
     if request.method == 'POST':
         email = employee.email
-        employee.delete()
-        messages.success(request, f'Employee {email} deleted successfully')
+        
+        try:
+            with transaction.atomic():
+                Leave.objects.filter(approved_by=employee).update(approved_by=None)
+                employee.leaves.all().delete()
+                employee.todos.all().delete()
+                employee.daily_updates.all().delete()
+                WorkingHoursSummary.objects.filter(employee=employee).delete()
+                employee.delete()
+            
+            messages.success(request, f'Employee {email} deleted successfully')
+            
+        except Exception as e:
+            messages.error(request, f'Error deleting employee: {str(e)}')
+            print(f"Delete error: {e}")  # Debug ke liye
+            
         return redirect('dashboard')
     
-    return render(request, 'accounts/confirm_delete.html', {'object': employee, 'type': 'Employee'})
+    # GET request - confirmation page
+    return render(request, 'accounts/confirm_delete.html', {
+        'object': employee, 
+        'type': 'Employee'
+    })
 
 @login_required
 def pm_team_view(request):
@@ -609,10 +646,80 @@ def profile_update(request):
 
 # views.py
 
+# @login_required
+# @admin_required
+# def admin_user_delete(request, user_id):
+#     """Delete a user with CASCADE handling"""
+#     user_obj = get_object_or_404(User, id=user_id)
+    
+#     if user_obj.is_superuser:
+#         messages.error(request, 'Cannot delete superuser')
+#         return redirect('admin_users_list')
+    
+#     if request.method == 'POST':
+#         try:
+#             email = user_obj.email
+            
+#             # Extra safety: Manually delete related objects first
+#             if user_obj.role == 'PM':
+#                 # PM ke employees delete karo
+#                 employees = User.objects.filter(created_by=user_obj)
+#                 emp_count = employees.count()
+                
+#                 # Har employee ke related data
+#                 for emp in employees:
+#                     emp.todos.all().delete()
+#                     emp.daily_updates.all().delete()
+#                     emp.leaves.all().delete()
+                
+#                 # Employees delete
+#                 employees.delete()
+                
+#                 # PM ke projects
+#                 user_obj.projects.all().delete()
+                
+#                 messages.info(request, f'Deleted {emp_count} employees and their data')
+            
+#             elif user_obj.role == 'EMPLOYEE':
+#                 # Employee ke related data
+#                 user_obj.todos.all().delete()
+#                 user_obj.daily_updates.all().delete()
+#                 user_obj.leaves.all().delete()
+            
+#             # Finally user delete karo
+#             user_obj.delete()
+            
+#             messages.success(request, f'User {email} deleted successfully')
+#             return redirect('admin_users_list')
+            
+#         except Exception as e:
+#             messages.error(request, f'Error deleting user: {str(e)}')
+#             return redirect('admin_users_list')
+    
+#     # GET request - Confirmation page
+#     # Count related objects
+#     related_count = 0
+#     if user_obj.role == 'PM':
+#         employees = User.objects.filter(created_by=user_obj)
+#         related_count = employees.count()
+#         projects_count = user_obj.projects.count()
+#     elif user_obj.role == 'EMPLOYEE':
+#         related_count = (
+#             user_obj.todos.count() + 
+#             user_obj.daily_updates.count() + 
+#             user_obj.leaves.count()
+#         )
+    
+#     return render(request, 'accounts/admin_user_delete.html', {
+#         'user_obj': user_obj,
+#         'related_count': related_count
+#     })
+
+
 @login_required
 @admin_required
 def admin_user_delete(request, user_id):
-    """Delete a user with CASCADE handling"""
+    """Admin deletes any user - with proper cleanup"""
     user_obj = get_object_or_404(User, id=user_id)
     
     if user_obj.is_superuser:
@@ -620,60 +727,51 @@ def admin_user_delete(request, user_id):
         return redirect('admin_users_list')
     
     if request.method == 'POST':
+        email = user_obj.email
+        
         try:
-            email = user_obj.email
-            
-            # Extra safety: Manually delete related objects first
-            if user_obj.role == 'PM':
-                # PM ke employees delete karo
-                employees = User.objects.filter(created_by=user_obj)
-                emp_count = employees.count()
+            with transaction.atomic():
+                # Leaves cleanup
+                Leave.objects.filter(approved_by=user_obj).update(approved_by=None)
                 
-                # Har employee ke related data
-                for emp in employees:
-                    emp.todos.all().delete()
-                    emp.daily_updates.all().delete()
-                    emp.leaves.all().delete()
+                if user_obj.role == 'PM':
+                    # PM ke employees
+                    employees = User.objects.filter(created_by=user_obj)
+                    
+                    for emp in employees:
+                        # Employee ke leaves jahan wo approver hai
+                        Leave.objects.filter(approved_by=emp).update(approved_by=None)
+                        
+                        # Employee ka data
+                        emp.leaves.all().delete()
+                        emp.todos.all().delete()
+                        emp.daily_updates.all().delete()
+                        WorkingHoursSummary.objects.filter(employee=emp).delete()
+                    
+                    # Employees delete
+                    employees.delete()
+                    
+                    # PM ke projects
+                    user_obj.projects.all().delete()
                 
-                # Employees delete
-                employees.delete()
+                elif user_obj.role == 'EMPLOYEE':
+                    # Employee ka data
+                    user_obj.leaves.all().delete()
+                    user_obj.todos.all().delete()
+                    user_obj.daily_updates.all().delete()
+                    WorkingHoursSummary.objects.filter(employee=user_obj).delete()
                 
-                # PM ke projects
-                user_obj.projects.all().delete()
-                
-                messages.info(request, f'Deleted {emp_count} employees and their data')
-            
-            elif user_obj.role == 'EMPLOYEE':
-                # Employee ke related data
-                user_obj.todos.all().delete()
-                user_obj.daily_updates.all().delete()
-                user_obj.leaves.all().delete()
-            
-            # Finally user delete karo
-            user_obj.delete()
+                # User delete
+                user_obj.delete()
             
             messages.success(request, f'User {email} deleted successfully')
-            return redirect('admin_users_list')
             
         except Exception as e:
-            messages.error(request, f'Error deleting user: {str(e)}')
-            return redirect('admin_users_list')
-    
-    # GET request - Confirmation page
-    # Count related objects
-    related_count = 0
-    if user_obj.role == 'PM':
-        employees = User.objects.filter(created_by=user_obj)
-        related_count = employees.count()
-        projects_count = user_obj.projects.count()
-    elif user_obj.role == 'EMPLOYEE':
-        related_count = (
-            user_obj.todos.count() + 
-            user_obj.daily_updates.count() + 
-            user_obj.leaves.count()
-        )
+            messages.error(request, f'Error: {str(e)}')
+            print(f"Admin delete error: {e}")
+            
+        return redirect('admin_users_list')
     
     return render(request, 'accounts/admin_user_delete.html', {
-        'user_obj': user_obj,
-        'related_count': related_count
+        'user_obj': user_obj
     })
