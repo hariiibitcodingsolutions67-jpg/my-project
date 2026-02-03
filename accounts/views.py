@@ -133,7 +133,6 @@ def admin_user_detail(request, user_id):
 @admin_required
 def admin_user_delete(request, user_id):
     """Delete a user"""
-    # """Delete a user"""
     user_obj = get_object_or_404(User, id=user_id)
     
     if user_obj.is_superuser:
