@@ -118,9 +118,7 @@ def admin_user_detail(request, user_id):
     if user_obj.role == 'EMPLOYEE':
         context['todos'] = Todo.objects.filter(employee=user_obj)[:10]
         context['updates'] = DailyUpdate.objects.filter(employee=user_obj)[:10]
-        context['total_hours'] = DailyUpdate.objects.filter(employee=user_obj).aggregate(
-            total=Sum('working_hours')
-        )['total'] or 0
+        context['total_hours'] = DailyUpdate.objects.filter(employee=user_obj).aggregate(total=Sum('working_hours'))['total'] or 0
     
     elif user_obj.role == 'PM':
         context['projects'] = Project.objects.filter(created_by=user_obj)
